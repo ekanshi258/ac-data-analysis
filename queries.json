@@ -1,0 +1,135 @@
+//User Profiles
+[
+{
+"$lookup":{
+    "from": "locations",
+    "localField": "personal_info.current_city_id",
+    "foreignField": "_id",
+    "as": "currentCity"
+}
+},
+{
+"$lookup":{
+    "from": "normalized_title",
+    "localField": "personal_info.normalized_profile_title",
+    "foreignField": "title",
+    "as": "normalizedtitle"
+}
+},
+{
+"$lookup":{
+    "from": "standardized_titles",
+    "localField": "normalizedtitle.standardized_title_id",
+    "foreignField": "_id",
+    "as": "standardizedtitle"
+}
+},
+ {"$project" :
+    {"personal_info.name" : 1, "_id" : 0, "personal_info.profile_title" : 1, "emails" : 1, "ln_profile_url" :1, "biolets.institute_name":1, "biolets.to_year":1, "personal_info.normalized_profile_title":1,
+    "currentCity.name":1, "currentCity.country_name":1, "standardizedtitle.title":1, "standardizedtitle.functional_area":1
+
+}}, 
+{"$sort" : {"personal_info.profile_title":-1}}
+]
+
+//User profiles of all who applied for atleast one job
+
+[{
+"$lookup":{
+    "from": "job_referral_infos",
+    "localField": "_id",
+    "foreignField": "candidate_id",
+    "as": "userProfile"
+}
+},
+{
+"$lookup":{
+    "from": "locations",
+    "localField": "personal_info.current_city_id",
+    "foreignField": "_id",
+    "as": "currentCity"
+}
+},
+{
+"$lookup":{
+    "from": "normalized_title",
+    "localField": "personal_info.normalized_profile_title",
+    "foreignField": "title",
+    "as": "normalizedtitle"
+}
+},
+{
+"$lookup":{
+    "from": "standardized_titles",
+    "localField": "normalizedtitle.standardized_title_id",
+    "foreignField": "_id",
+    "as": "standardizedtitle"
+}
+},
+ {"$project" :
+    {"personal_info.name" : 1, "_id" : 0, "personal_info.profile_title" : 1, "emails" : 1, "ln_profile_url" :1, "biolets.institute_name":1, "biolets.to_year":1, "personal_info.normalized_profile_title":1,
+    "currentCity.name":1, "currentCity.country_name":1, "standardizedtitle.title":1, "standardizedtitle.functional_area":1
+
+}}
+]
+
+//Users who have uploaded their resumes through job peferences
+
+
+[{
+"$lookup":{
+    "from": "job_referral_infos",
+    "localField": "_id",
+    "foreignField": "candidate_id",
+    "as": "userProfile"
+}
+},
+{
+"$lookup":{
+    "from": "locations",
+    "localField": "personal_info.current_city_id",
+    "foreignField": "_id",
+    "as": "currentCity"
+}
+},
+{
+"$lookup":{
+    "from": "normalized_title",
+    "localField": "personal_info.normalized_profile_title",
+    "foreignField": "title",
+    "as": "normalizedtitle"
+}
+},
+{
+"$lookup":{
+    "from": "standardized_titles",
+    "localField": "normalizedtitle.standardized_title_id",
+    "foreignField": "_id",
+    "as": "standardizedtitle"
+}
+},
+{
+"$lookup":{
+    "from": "aux_users",
+    "localField": "_id",
+    "foreignField": "user_id",
+    "as": "job_pref_resume"
+}
+},
+ {"$project" :
+    {"personal_info.name" : {"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
+    "_id" : 0,
+    "personal_info.profile_title" : {"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
+    "emails" : {"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
+    "ln_profile_url" :{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
+    "biolets.institute_name":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
+    "biolets.to_year":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
+    "personal_info.normalized_profile_title":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
+    "currentCity.name":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
+    "currentCity.country_name":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
+    "standardizedtitle.title":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
+    "standardizedtitle.functional_area":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]}
+
+}}
+]
+
