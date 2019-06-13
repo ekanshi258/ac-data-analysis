@@ -31,7 +31,7 @@
 }}, 
 {"$sort" : {"personal_info.profile_title":-1}}
 ]
-
+//--------------------------------------------------------------------------------------------------------------------------------------
 //User profiles of all who applied for atleast one job
 
 [{
@@ -72,9 +72,8 @@
 
 }}
 ]
-
+//----------------------------------------------------------------------------------------------------------------------------------------
 //Users who have uploaded their resumes through job peferences
-
 
 [{
 "$lookup":{
@@ -116,20 +115,31 @@
     "as": "job_pref_resume"
 }
 },
+{"$match":{"$ne":["$job_pref_resume.job_preference",null]}},
  {"$project" :
-    {"personal_info.name" : {"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
+    {"personal_info.name" :1,
     "_id" : 0,
-    "personal_info.profile_title" : {"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
-    "emails" : {"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
-    "ln_profile_url" :{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
-    "biolets.institute_name":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
-    "biolets.to_year":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
-    "personal_info.normalized_profile_title":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
-    "currentCity.name":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
-    "currentCity.country_name":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
-    "standardizedtitle.title":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]},
-    "standardizedtitle.functional_area":{"$cond":[{"$ne":["$job_pref_resume.job_preference",""]},1,0]}
+    "personal_info.profile_title" :1,
+    "emails" : 1,
+    "ln_profile_url" :1,
+    "biolets.institute_name":1,
+    "biolets.to_year":1,
+    "personal_info.normalized_profile_title":1,
+    "currentCity.name":1,
+    "currentCity.country_name":1,
+    "standardizedtitle.title":1,
+    "standardizedtitle.functional_area":1
 
 }}
 ]
-
+//---------------------------------------------------------------------------
+//Default fields for networks
+[{"$unwind":"$institution_streams"},
+{"$match":{"institution_streams.is_primary":true}},
+ {
+     "$project":{
+         "_id":0, "name":1,"host":1,"user_count":1, "institution_streams.name":1, "institution_streams.rank":1
+         
+     }
+    }
+]
