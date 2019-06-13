@@ -24,12 +24,13 @@
     "as": "standardizedtitle"
 }
 },
+{"$unwind":"$personal_info"},
+{"$unwind":"$biolets"},
  {"$project" :
-    {"personal_info.name" : 1, "_id" : 0, "personal_info.profile_title" : 1, "emails" : 1, "ln_profile_url" :1, "biolets.institute_name":1, "biolets.to_year":1, "personal_info.normalized_profile_title":1,
-    "currentCity.name":1, "currentCity.country_name":1, "standardizedtitle.title":1, "standardizedtitle.functional_area":1
+    {"Name":"$personal_info.name", "_id" : 0, "ProfileTitle":"$personal_info.profile_title", "emails" : 1, "ln_profile_url" :1, "Institute":"$biolets.institute_name", "Graduation_Year":"$biolets.to_year", "Normalized_title:":"$personal_info.normalized_profile_title",
+    "City":"$currentCity.name", "Country":"$currentCity.country_name", "Standard Title":"$standardizedtitle.title", "FunctionalArea":"$standardizedtitle.functional_area"
 
-}}, 
-{"$sort" : {"personal_info.profile_title":-1}}
+}}
 ]
 //--------------------------------------------------------------------------------------------------------------------------------------
 //User profiles of all who applied for atleast one job
