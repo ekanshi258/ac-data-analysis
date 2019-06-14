@@ -144,3 +144,73 @@
      }
     }
 ]
+//----------------------------------------------------------------------------------------------------------
+//Network wise job module analysis
+[{"$match":{"job_posting_premium":"true"}},
+{"$unwind":"$institution_streams"},
+{"$match":{"institution_streams.is_primary":true}},
+{
+"$lookup":{
+    "from": "job_postings",
+    "localField": "_id",
+    "foreignField": "institute_id",
+    "as": "jobs"
+}
+},
+{
+"$lookup":{
+    "from": "job_referral_infos",
+    "localField": "_id",
+    "foreignField": "institute_id",
+    "as": "jobref"
+}
+},
+{
+"$lookup":{
+    "from": "email_tracking",
+    "localField": "_id",
+    "foreignField": "college_id",
+    "as": "emails"
+}
+},
+{"$match":{"emails.email_type": "job_posting.aggregated"}},
+{
+"$lookup":{
+    "from": "user_profiles",
+    "localField": "_id",
+    "foreignField": "biolets.institute_id",
+    "as": "users"
+}
+},
+{"$lookup":{
+    "from": "aux_users",
+    "localField": "users._id",
+    "foreignField": "user_id",
+    "as": "auxusers"
+}
+},
+{"$lookup":{
+    "from": "job_postings",
+    "localField": "_id",
+    "foreignField": "all_institute_ids._id",
+    "as": "joblist"
+}
+},
+{
+    "$group":{
+        "_id": "_id",
+        "Institute":{"$first":"$name"},
+        "Jobs Posted":{"$sum":{"$cond":[{"$ne":["$jobs._id",null]},1,0]}},
+        "Jobs Listed":{"$sum":{"$cond":[{"$ne":["$jobslist._id",null]},1,0]}},
+        "Applications":{"$sum":{"$cond":[{"$ne":["$jobref.conversation_id",null]},1,0]}},
+        "No of Emails opened":{"$sum":{"$cond":[{"$ne":["emails.first_opened_at",null]},1,0]}},
+        "No of Emails clicked":{"$sum":{"$cond":[{"$ne":["emails.first_clicked_at",null]},1,0]}},
+        "No of times emails opened":{"$sum":{"$size":"$emails.opened_ats"}},
+        "Signedup Users":{"$sum":{"$cond":[{"$ne":["users._id",null]},1,0]}},
+        "Job Seekers":{"$sum":{"$cond":[{"$ne":[{"$size":"$auxusers.resume_ids"},0]},1,0]}},
+        "People with updated preferences":{"$sum":{"$cond":[{"$ne":[{"$size":"$auxusers.job_preference"},0]},1,0]}},
+        "Primary stream":{"$first":"$institution_streams.name"},
+        "Primary Rank":{"$first":"$institution_streams.rank"}
+    }
+}
+]
