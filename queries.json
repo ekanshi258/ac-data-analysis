@@ -214,3 +214,45 @@
     }
 }
 ]
+//----------------------------------------------------------------------------------------------------------------------
+//Company vs Postings
+[{
+"$lookup":{
+    "from": "institutions",
+    "localField": "institute_id",
+    "foreignField": "_id",
+    "as": "job_posting_network"
+}},
+{
+"$lookup":{
+    "from": "institutions",
+    "localField": "company_id",
+    "foreignField": "_id",
+    "as": "company"
+}},
+{
+"$lookup":{
+    "from": "job_referral_infos",
+    "localField": "_id",
+    "foreignField": "job_id",
+    "as": "applications_reverts"
+}},
+{"$unwind":"$applications_reverts"},
+{
+    "$group":{
+        "_id": "$_id",
+        "Network":{"$first":"$job_posting_network.name"},
+        "Company":{"$first":"$company.name"},
+        "Company_size":{"$first":"$company.company_size"},
+        "Sector":{"$first":"$company.company_type"},
+        "FoundedYear":{"$first":"$company.founded_year"},
+        "applications":{ "$sum":{ "$cond":[
+            {"$ne":["$applications_reverts.conversation_id",null]},1,0
+        ]}},
+        "replies":{"$sum":{"$cond":[
+            {"$eq":["$applications_reverts.replied",true]},1,0
+        ]}}
+    }
+}
+
+]
