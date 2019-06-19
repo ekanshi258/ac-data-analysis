@@ -78,6 +78,48 @@
 }}
 ]
 
+-------------------Alternate Query (Using $lookup from the other side)
+[{
+"$lookup":{
+    "from": "user_profiles",
+    "localField": "candidate_id",
+    "foreignField": "_id",
+    "as": "jobApp"
+}
+},
+{
+"$lookup":{
+    "from": "locations",
+    "localField": "jobApp.personal_info.current_city_id",
+    "foreignField": "_id",
+    "as": "currentCity"
+}
+},
+{
+"$lookup":{
+    "from": "normalized_title",
+    "localField": "jobApp.personal_info.normalized_profile_title",
+    "foreignField": "title",
+    "as": "normalizedtitle"
+}
+},
+{
+"$lookup":{
+    "from": "standardized_titles",
+    "localField": "jobApp.normalizedtitle.standardized_title_id",
+    "foreignField": "_id",
+    "as": "standardizedtitle"
+}
+},
+{"$unwind":"$jobApp.personal_info"},
+{"$unwind":"$jobApp.biolets"},
+ {"$project" :
+    {"Name":"$jobApp.personal_info.name", "_id" : 0, "ProfileTitle":"$jobApp.personal_info.profile_title", "jobApp.emails" : 1, "jobApp.ln_profile_url" :1, "Institute":"$jobApp.biolets.institute_name", "Graduation_Year":"$jobApp.biolets.to_year", "Normalized_title:":"$jobApp.personal_info.normalized_profile_title",
+    "City":"$currentCity.name", "Country":"$currentCity.country_name", "Standard Title":"$standardizedtitle.title", "FunctionalArea":"$standardizedtitle.functional_area"
+
+}}
+]
+
 //----------------------------------------------------------------------------------------------------------------------------------------
 //Users who have uploaded their resumes through job peferences
 
