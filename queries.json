@@ -183,13 +183,19 @@
 //---------------------------------------------------------------------------
 //Default fields for networks
 [{"$unwind":"$institution_streams"},
-{"$match":{"institution_streams.is_primary":true}},
- {
-     "$project":{
-         "_id":0, "name":1,"host":1,"user_count":1, "institution_streams.name":1, "institution_streams.rank":1
-         
-     }
-    }
+{
+      "$redact": {
+       "$cond": [{ "$eq": [ "$institution_streams.is_primary",true ] },"$$KEEP","$$PRUNE"]
+      }
+},
+{"$project":{
+   "_id":0,
+   "name":1,
+   "isprimary":"$institution_streams.is_primary",
+   "Stream":"$institution_streams.name",
+   "Rank":"$institution_streams.ranking",
+   "host":1,"user_count":1
+}}
 ]
 //----------------------------------------------------------------------------------------------------------
 //Network wise job module analysis
