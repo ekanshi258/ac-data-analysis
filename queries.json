@@ -11,7 +11,7 @@
 },
 {"$project" :
     {"Name":"$personal_info.name", "_id" : 0, "ProfileTitle":"$personal_info.profile_title", "emails" : "$emails.email", "ln_profile_url" :1, "Institute":"$biolets.institute_name", "Graduation_Year":"$biolets.to_year", "Normalized_title:":"$personal_info.normalized_profile_title",
-    "City":"$personal_info.current_city_name", "Country":"$personal_info.current_city_country_name", "Standard Title":"$standardizedtitle.title", "FunctionalArea":"$standardizedtitle.functional_area","Level":"$standardizedtitle.seniority_level","Employment Type":"$standardizedtitle.occupation", "Phone numbers":"$phone_nos"
+    "City":"$personal_info.current_city_name", "Country":"$personal_info.current_city_country_name", "Standard Title":"$standardizedtitle.title", "FunctionalArea":"$standardizedtitle.functional_area","Level":"$standardizedtitle.seniority_level","Employment Type":"$standardizedtitle.occupation", "Phone numbers":"$phone_nos.number"
 }}
 ]
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -334,7 +334,7 @@
 
 {"$project" :
     {"Name":"$personal_info.name", "_id" : 0, "ProfileTitle":"$personal_info.profile_title", "emails" : "$emails.email", "ln_profile_url" :1, "Institute":"$biolets.institute_name", "Graduation_Year":"$biolets.to_year", "Normalized_title:":"$personal_info.normalized_profile_title",
-    "City":"$personal_info.current_city_name", "Country":"$personal_info.current_city_country_name", "Standard Title":"$standardizedtitle.title", "FunctionalArea":"$standardizedtitle.functional_area","Level":"$standardizedtitle.seniority_level","Employment Type":"$standardizedtitle.occupation", "Phone numbers":"$phone_nos",
+    "City":"$personal_info.current_city_name", "Country":"$personal_info.current_city_country_name", "Standard Title":"$standardizedtitle.title", "FunctionalArea":"$standardizedtitle.functional_area","Level":"$standardizedtitle.seniority_level","Employment Type":"$standardizedtitle.occupation", "Phone numbers":"$phone_nos.number",
     "Company":"$personal_info.currently_at_name", "Company Size":"$company.company_size", "Founded year":"$company.founded_year", "Type":"$company.company_type"
 }}
 ]
