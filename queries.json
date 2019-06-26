@@ -309,3 +309,24 @@
 }
 
 ]
+//------------------------------------------------------------------------------
+//Number of active job seekers in custom time period
+[
+{"$match":{"resume_ids":{"$ne":null}}},
+{
+"$lookup":{
+    "from": "ac_asset_files",
+    "localField": "resume_ids",
+    "foreignField": "_id",
+    "as": "resume"
+}},
+{"$project":{"LatestResume":{"$max":"$resume.created_at"}}},
+{"$group":
+    {
+        "_id":null,
+        "count":{"$sum":{
+        "$cond":[{"$and":[{"$gte":["$LatestResume",ISODate("2019-05-01T00:00:01.000Z")]},{"$lte":["$LatestResume",ISODate("2019-06-26T00:00:01.000Z")]}]},
+        1,0]}}
+    }
+}
+]
