@@ -1,35 +1,17 @@
 //User Profiles
-[
-{
-"$lookup":{
-    "from": "locations",
-    "localField": "personal_info.current_city_id",
-    "foreignField": "_id",
-    "as": "currentCity"
-}
-},
-{
-"$lookup":{
-    "from": "normalized_title",
-    "localField": "personal_info.normalized_profile_title",
-    "foreignField": "title",
-    "as": "normalizedtitle"
-}
-},
+[{"$unwind":"$biolets"},
+    {"$match":{"biolets.institute_title":"BITS Pilani"}},
 {
 "$lookup":{
     "from": "standardized_titles",
-    "localField": "normalizedtitle.standardized_title_id",
-    "foreignField": "_id",
+    "localField": "personal_info.normalized_profile_title",
+    "foreignField": "normalized_title",
     "as": "standardizedtitle"
 }
 },
-{"$unwind":"$personal_info"},
-{"$unwind":"$biolets"},
- {"$project" :
-    {"Name":"$personal_info.name", "_id" : 0, "ProfileTitle":"$personal_info.profile_title", "emails" : 1, "ln_profile_url" :1, "Institute":"$biolets.institute_name", "Graduation_Year":"$biolets.to_year", "Normalized_title:":"$personal_info.normalized_profile_title",
-    "City":"$currentCity.name", "Country":"$currentCity.country_name", "Standard Title":"$standardizedtitle.title", "FunctionalArea":"$standardizedtitle.functional_area"
-
+{"$project" :
+    {"Name":"$personal_info.name", "_id" : 0, "ProfileTitle":"$personal_info.profile_title", "emails" : "$emails.email", "ln_profile_url" :1, "Institute":"$biolets.institute_name", "Graduation_Year":"$biolets.to_year", "Normalized_title:":"$personal_info.normalized_profile_title",
+    "City":"$personal_info.current_city_name", "Country":"$personal_info.current_city_country_name", "Standard Title":"$standardizedtitle.title", "FunctionalArea":"$standardizedtitle.functional_area","Level":"$standardizedtitle.seniority_level","Employment Type":"$standardizedtitle.occupation", "Phone numbers":"$phone_nos"
 }}
 ]
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -329,4 +311,30 @@
         1,0]}}
     }
 }
+]
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+//Designations database dump
+[{"$unwind":"$biolets"},
+    {"$match":{"biolets.institute_title":"BITS Pilani"}},
+{
+"$lookup":{
+    "from": "standardized_titles",
+    "localField": "personal_info.normalized_profile_title",
+    "foreignField": "normalized_title",
+    "as": "standardizedtitle"
+}
+},
+{
+"$lookup":{
+    "from": "institutions",
+    "localField": "personal_info.currently_at_id",
+    "foreignField": "_id",
+    "as": "company"
+}},
+
+{"$project" :
+    {"Name":"$personal_info.name", "_id" : 0, "ProfileTitle":"$personal_info.profile_title", "emails" : "$emails.email", "ln_profile_url" :1, "Institute":"$biolets.institute_name", "Graduation_Year":"$biolets.to_year", "Normalized_title:":"$personal_info.normalized_profile_title",
+    "City":"$personal_info.current_city_name", "Country":"$personal_info.current_city_country_name", "Standard Title":"$standardizedtitle.title", "FunctionalArea":"$standardizedtitle.functional_area","Level":"$standardizedtitle.seniority_level","Employment Type":"$standardizedtitle.occupation", "Phone numbers":"$phone_nos",
+    "Company":"$personal_info.currently_at_name", "Company Size":"$company.company_size", "Founded year":"$company.founded_year", "Type":"$company.company_type"
+}}
 ]
