@@ -1,6 +1,5 @@
 //User Profiles
-[{"$unwind":"$biolets"},
-    {"$match":{"biolets.institute_title":"BITS Pilani"}},
+[
 {
 "$lookup":{
     "from": "standardized_titles",
