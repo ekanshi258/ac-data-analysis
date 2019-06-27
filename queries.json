@@ -337,3 +337,40 @@
     "Company":"$personal_info.currently_at_name", "Company Size":"$company.company_size", "Founded year":"$company.founded_year", "Type":"$company.company_type"
 }}
 ]
+//-----------------------------------------------------------------------------------------------------------
+//Dump for education
+[
+    {"$match":{"biolets.institute_title":"BITS Pilani"}},
+    {"$unwind":"$biolets"},
+    {"$match":{"biolets.institute_type":"Institution::College"}},
+{
+"$lookup":{
+    "from": "institutions",
+    "localField": "biolets.institute_id",
+    "foreignField": "_id",
+    "as": "colleges"
+}},
+{"$match":{"colleges.institution_streams.is_primary":true}},
+{"$project" :
+    {"Name":"$personal_info.name", "_id" : 0, "ProfileTitle":"$personal_info.profile_title", "emails" : "$emails.email", "ln_profile_url" :1, "Institute":"$biolets.institute_name", "Graduation_Year":"$biolets.to_year", "Normalized_title:":"$personal_info.normalized_profile_title",
+    "Current City":"$personal_info.current_city_name", "Current Country":"$personal_info.current_city_country_name", 
+    "institute Primary stream":"$colleges.institution_streams.name", "institute rank":"$colleges.institution_streams.ranking","Is primary":"$colleges.institution_streams.is_primary",
+    "phone_nos.number":1, "Course":"$biolets.course_name", "Stream":"$biolets.branch_name" ,"Institute Location":"$colleges.location_name"
+}}
+]
+//-----------------------------------------------------------------------------------------------------------
+//All normalized and standardized title
+[
+{
+"$lookup":{
+    "from": "standardized_titles",
+    "localField": "standardized_title_ids",
+    "foreignField": "_id",
+    "as": "standard"
+}},
+{
+    "$project":{
+        "_id":0, "Normalized title":"$title", "Standardized titles":"$standard.title","Functional area":"$standard.functional_area"
+    }
+}
+]
