@@ -339,23 +339,29 @@
 ]
 //-----------------------------------------------------------------------------------------------------------
 //Dump for education
-[
+[{"$unwind":"$biolets"},
     {"$match":{"biolets.institute_title":"BITS Pilani"}},
-    {"$unwind":"$biolets"},
-    {"$match":{"biolets.institute_type":"Institution::College"}},
+{
+"$lookup":{
+    "from": "standardized_titles",
+    "localField": "personal_info.normalized_profile_title",
+    "foreignField": "normalized_title",
+    "as": "standardizedtitle"
+}
+},
 {
 "$lookup":{
     "from": "institutions",
-    "localField": "biolets.institute_id",
+    "localField": "personal_info.currently_at_parent_id",
     "foreignField": "_id",
-    "as": "colleges"
+    "as": "company"
 }},
-{"$match":{"colleges.institution_streams.is_primary":true}},
+
 {"$project" :
     {"Name":"$personal_info.name", "_id" : 0, "ProfileTitle":"$personal_info.profile_title", "emails" : "$emails.email", "ln_profile_url" :1, "Institute":"$biolets.institute_name", "Graduation_Year":"$biolets.to_year", "Normalized_title:":"$personal_info.normalized_profile_title",
-    "Current City":"$personal_info.current_city_name", "Current Country":"$personal_info.current_city_country_name", 
-    "institute Primary stream":"$colleges.institution_streams.name", "institute rank":"$colleges.institution_streams.ranking","Is primary":"$colleges.institution_streams.is_primary",
-    "phone_nos.number":1, "Course":"$biolets.course_name", "Stream":"$biolets.branch_name" ,"Institute Location":"$colleges.location_name"
+    "City":"$personal_info.current_city_name", "Country":"$personal_info.current_city_country_name", "Standard Title":"$standardizedtitle.title", "FunctionalArea":"$standardizedtitle.functional_area","Level":"$standardizedtitle.seniority_level","Employment Type":"$standardizedtitle.occupation", 
+    "phone_nos.number":1,
+    "Company":"$personal_info.currently_at_name", "Company Size":"$company.company_size", "Founded year":"$company.founded_year", "Type":"$company.company_type"
 }}
 ]
 //-----------------------------------------------------------------------------------------------------------
@@ -373,4 +379,24 @@
         "_id":0, "Normalized title":"$title", "Standardized titles":"$standard.title","Functional area":"$standard.functional_area"
     }
 }
+]
+//---------------------------------------------------------------------------------------------------------------------------------------------
+//Number of graduates per year (according to latest grad year)
+[{"$unwind":"$biolets"},
+    {"$match":{"biolets._type":"Biolets::Education"}},
+{"$project":{"GradYear":"$biolets.to_year"}},
+{
+    "$group":{
+        "_id":"$_id",
+        "gradyears":{"$push":"$GradYear"}
+    }
+},
+{"$project":{"Latest":{"$max":"$gradyears"}}},
+{
+  "$group":{
+      "_id":"$Latest",
+      "count":{"$sum":1}
+  }  
+},
+{"$sort":{"_id":1}}
 ]
